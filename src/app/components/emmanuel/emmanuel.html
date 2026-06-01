@@ -1,1 +1,13 @@
-<p>emmanuel works!</p>
+<div class="decompte text-center p-4 rounded-4 text-white shadow-lg m-3" >
+    <h2>Où en sommes nous ?</h2>
+ 
+  @if (dateDepart > maintenant ){
+     <p class="compteur">J {{ compteur }} jour(s)</p>
+    <h3 class="datedepart">avant la fin de notre formation</h3>}
+  @else if (dateDepart.getDate() == maintenant.getDate() ){
+    Aujourd'hui, c'est le grand jour!!! <br>
+     <h3 class="datedepart">Félicitations à tous pour votre parcours et Bon courage</h3>
+    <img  src="/images/photofunky.gif" alt="Célébration">}
+  @else{ <h3 class="compteur">J + {{ compteur }} jour(s)</h3>
+    <h3 class="datedepart">écoulé(s) depuis la fin de notre formation DWWM</h3>}
+</div>
