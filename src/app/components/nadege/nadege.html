@@ -1,1 +1,8 @@
-<p>nadege works!</p>
+<section class="farewell-card">
+  <img class="farewell-image" [src]="logoUrl" alt="Message d'au revoir" />
+  <h2>AU REVOIR 🥹</h2>
+  <p>{{ farewellMessage }}</p>
+  <ul>
+    <li *ngFor="let line of farewellDetails">{{ line }}</li>
+  </ul>
+</section>

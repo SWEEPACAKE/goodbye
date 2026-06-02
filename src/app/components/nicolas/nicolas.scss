@@ -1,0 +1,134 @@
+// --- Variables de configuration ---
+$book-width: 400px;
+$book-height: 520px;
+$bg-page: #fffaf0;
+$color-text: #333;
+$transition-book: transform 1.3s cubic-bezier(0.4, 0, 0.2, 1);
+$shadow-fold: rgba(0, 0, 0, 0.08);
+
+/* --- Le Livre & Ses Pages --- */
+.book {
+    position: relative;
+    width: $book-width;
+    height: $book-height;
+    box-shadow: 5px 5px 20px rgba(0, 0, 0, 0.15);
+    transform-style: preserve-3d;
+    transition: $transition-book;
+    cursor: pointer;
+
+    // Centrage du livre une fois ouvert
+    &.open {
+        transform: translateX(100%);
+
+        // Animation de bascule du volet gauche au clic
+        .page-left-container {
+            transform: rotateY(-180deg);
+        }
+    }
+}
+
+.page {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    box-sizing: border-box;
+    padding: 45px 35px;
+    background-color: $bg-page;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+    background-size: 100% 2em;
+    line-height: 1.2em;
+    color: $color-text;
+    font-size: 1.8rem;
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    &.cover {
+      background-color: #1a1a1a;
+      z-index: 2;
+      border-right: 2px solid #e0dcd5;
+    }
+
+    &.page-one {
+      font-family: "Lavishly Yours", cursive;
+      transform: rotateY(180deg);
+      z-index: 1;
+
+      &::after {
+          @extend %fold-shadow;
+          right: 0;
+          background: linear-gradient(to left, $shadow-fold, transparent);
+      }
+    }
+
+    &.page-right {
+      font-family: "Lavishly Yours", cursive;
+      z-index: 1;
+
+      &::after {
+          @extend %fold-shadow;
+          left: 0;
+          background: linear-gradient(to right, $shadow-fold, transparent);
+      }
+    }
+}
+
+.page-left-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transform-origin: left center;
+    transition: $transition-book;
+    z-index: 2;
+}
+
+/* --- Détails esthétiques & Contenu --- */
+.cover-title {
+    text-align: center;
+    margin-top: 45%;
+    font-style: italic;
+    color: #d4af37;
+    font-size: 1.8rem;
+    border-bottom: 1px solid #aa7c11;
+    padding-bottom: 20px;
+}
+
+.click-hint {
+    text-align: center;
+    font-size: 0.8rem;
+    color: #999;
+    margin-top: 60px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+%fold-shadow {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 20px;
+}
+
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-color: #f0eae1;
+  font-family: 'Georgia', serif;
+  margin: 0;
+  perspective: 2000px; /* Crée la profondeur globale */
+}
+
+canvas {
+  width: 100%;
+  height: 100%;
+  min-height: 200px;
+  display: block;
+  outline: none;
+  background: #1a1a2e;
+  border-radius: 8px;
+  cursor: pointer;
+}
