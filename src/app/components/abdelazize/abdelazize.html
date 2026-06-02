@@ -1,1 +1,152 @@
-<p>abdelazize works!</p>
+<div class="wrapper"
+  (mousedown)="onDragStart($event)"
+  (mouseup)="onDragEnd($event)"
+  (touchstart)="onDragStart($event)"
+  (touchend)="onDragEnd($event)">
+
+  <!-- BOOT -->
+  <div class="page boot" [class.active]="currentPage === 0" [class.flip-out]="currentPage > 0">
+    <div class="scan"></div>
+    <div class="boot-inner">
+      <div class="boot-header">ABDELAZIZE_OS</div>
+      <div class="boot-lines">
+        <div class="boot-line done" *ngFor="let l of displayedLines"
+          [class.gold]="l.includes('OK')"
+          [class.blue]="l.includes('prêt')">{{ l }}</div>
+        <div class="boot-line typing" *ngIf="currentTyping">{{ currentTyping }}<span class="cursor">█</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE 1 : ORIGINE -->
+  <div class="page chapter"
+    [class.active]="currentPage === 1"
+    [class.flip-in-next]="currentPage === 1 && flipDirection === 'next' && !isFlipping"
+    [class.flip-in-prev]="currentPage === 1 && flipDirection === 'prev' && !isFlipping">
+    <div class="ch-label">Chapitre 01</div>
+    <div class="ch-title">L'Origine</div>
+    <div class="origin-block">
+      <div class="big61">61</div>
+      <div class="origin-lines">
+        <p class="ol-lead">L'âge auquel tout recommencer.</p>
+        <p>Juin 2025. Une décision. Pas un choix par défaut — une conviction profonde.</p>
+        <p>Rejoindre une formation DWWM de 10 mois. Apprendre à coder de zéro. Construire des projets réels. Livrer. Se réinventer.</p>
+        <p class="ol-strong">Pas malgré l'âge. Grâce au caractère.</p>
+      </div>
+    </div>
+    <div class="ch-foot">Formation débutée le 18 juin 2025 — Yzeure, France</div>
+  </div>
+
+  <!-- PAGE 2 : TIMELINE -->
+  <div class="page chapter"
+    [class.active]="currentPage === 2"
+    [class.flip-in-next]="currentPage === 2 && flipDirection === 'next' && !isFlipping"
+    [class.flip-in-prev]="currentPage === 2 && flipDirection === 'prev' && !isFlipping">
+    <div class="ch-label">Chapitre 02</div>
+    <div class="ch-title">10 Mois</div>
+    <div class="timeline">
+      <div class="tl-item" *ngFor="let m of months" [class.gold]="m.gold">
+        <div class="tl-dot"></div>
+        <div class="tl-date">{{ m.date }}</div>
+        <div class="tl-label">{{ m.label }}</div>
+        <div class="tl-desc">{{ m.desc }}</div>
+      </div>
+    </div>
+    <div class="skill-pills">
+      <span *ngFor="let s of skills">{{ s }}</span>
+    </div>
+  </div>
+
+  <!-- PAGE 3 : STAGES -->
+  <div class="page chapter"
+    [class.active]="currentPage === 3"
+    [class.flip-in-next]="currentPage === 3 && flipDirection === 'next' && !isFlipping"
+    [class.flip-in-prev]="currentPage === 3 && flipDirection === 'prev' && !isFlipping">
+    <div class="ch-label">Chapitre 03</div>
+    <div class="ch-title">Le Terrain</div>
+    <div class="stages">
+      <div class="stage-card">
+        <div class="stage-num">01</div>
+        <div class="stage-body">
+          <div class="stage-name">Mairie d'Yzeure</div>
+          <div class="stage-dates">01 déc. 2025 — 19 déc. 2025</div>
+          <div class="stage-desc">Administration publique. Systèmes internes. Premier contact avec l'environnement professionnel réel.</div>
+        </div>
+      </div>
+      <div class="stage-divider"></div>
+      <div class="stage-card">
+        <div class="stage-num">02</div>
+        <div class="stage-body">
+          <div class="stage-name">Evolea — Moulins</div>
+          <div class="stage-dates">23 fév. 2026 — 27 mars 2026</div>
+          <div class="stage-desc">Coopérative ESS. Outils collaboratifs. Développement en conditions réelles d'entreprise.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE 4 : EXAMEN -->
+  <div class="page chapter"
+    [class.active]="currentPage === 4"
+    [class.flip-in-next]="currentPage === 4 && flipDirection === 'next' && !isFlipping"
+    [class.flip-in-prev]="currentPage === 4 && flipDirection === 'prev' && !isFlipping">
+    <div class="ch-label">Chapitre 04</div>
+    <div class="ch-title">Le Jour J</div>
+    <div class="exam-block">
+      <div class="exam-date">
+        <span class="exam-day">28</span>
+        <span class="exam-my">MAI 2026</span>
+      </div>
+      <div class="exam-info">
+        <div class="exam-proj-label">Projet jury</div>
+        <div class="exam-proj-name">MyCitizenAlert</div>
+        <div class="exam-proj-stack">Angular 21 · Symfony 7.4 · Docker · JWT</div>
+        <div class="exam-status">
+          <span class="pulse-dot"></span>
+          Résultats dans 2 à 3 semaines
+        </div>
+      </div>
+    </div>
+    <div class="ch-foot">Formation terminée le <strong>04 juin 2026</strong></div>
+  </div>
+
+  <!-- PAGE 5 : SUITE -->
+  <div class="page chapter"
+    [class.active]="currentPage === 5"
+    [class.flip-in-next]="currentPage === 5 && flipDirection === 'next' && !isFlipping"
+    [class.flip-in-prev]="currentPage === 5 && flipDirection === 'prev' && !isFlipping">
+    <div class="ch-label">Chapitre 05</div>
+    <div class="ch-title">La Suite</div>
+    <div class="future">
+      <div class="future-role">Consultant IA & Automatisation Métier</div>
+      <div class="ia-levels">
+        <div class="ia-item" *ngFor="let sk of nextSkills">
+          <div class="ia-top">
+            <span class="ia-name">{{ sk.label }}</span>
+            <span class="ia-hours">{{ sk.hours }}</span>
+            <span class="ia-lvl">{{ sk.level }}</span>
+          </div>
+          <div class="ia-track">
+            <div class="ia-fill" [style.width.%]="sk.pct"></div>
+          </div>
+        </div>
+      </div>
+      <div class="future-targets">n8n &nbsp;·&nbsp; LangChain &nbsp;·&nbsp; AWS &nbsp;·&nbsp; Architecture IA</div>
+      <div class="goodbye">A bientôt, le monde.</div>
+    </div>
+  </div>
+
+  <!-- NAV -->
+  <div class="nav" *ngIf="currentPage > 0">
+    <button class="nav-btn" (click)="prev()" [disabled]="currentPage <= 1">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <div class="nav-dots">
+      <div class="nav-dot" *ngFor="let p of range(5)" [class.active]="currentPage === p" (click)="goTo(p)"></div>
+    </div>
+    <button class="nav-btn" (click)="next()" [disabled]="currentPage >= totalPages - 1">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+  </div>
+
+</div>
