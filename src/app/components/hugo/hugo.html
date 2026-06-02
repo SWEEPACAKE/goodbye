@@ -1,1 +1,143 @@
-<p>hugo works!</p>
+<div id="background">
+  <div class="stars"></div>
+  <div class="stars2"></div>
+  <div class="stars3"></div>
+  <div class="shooting-star"></div>
+  <div class="shooting-star s2"></div>
+
+  <!-- HUD vies -->
+  @if (gameState() !== 'start') {
+    <div class="hud-lives d-flex align-items-center">
+      @for (life of livesArray(); track $index) {
+        <div class="life-icon" [ngClass]="life">
+          <img src="images/spaceship-hugo.png" alt="vie" />
+        </div>
+      }
+    </div>
+  }
+
+  <!-- HUD Score & niveau -->
+  @if (gameState() !== 'start') {
+    <div class="hud-score">{{ score() }} <span class="hud-unit">pts</span></div>
+    @if (!boss()) {
+      <div class="hud-level">LVL {{ diffLevel() }}</div>
+    } @else {
+      <div class="hud-boss-passes">BOSS <span class="passes-count">×{{ bossPassesLeft() }}</span></div>
+    }
+  }
+
+  <!-- Obstacles tech-logo (cachés pendant l'animation) -->
+  @if (animState() === 'none') {
+    @for (obs of obstacles(); track obs.id) {
+      <div class="obstacle"
+           [ngClass]="'danger-' + obs.danger"
+           [style.left.%]="obs.x"
+           [style.top.%]="obs.y"
+           [style.transform]="'translate(-50%, -50%) rotate(' + obs.rotation + 'deg)'"
+           [style.--obs-color]="obs.color"
+           [style.--obs-text]="obs.textColor">
+        <div class="obs-circle d-flex align-items-center justify-content-center rounded-circle">{{ obs.icon }}</div>
+        <div class="obs-label">{{ obs.label }}</div>
+      </div>
+    }
+  }
+
+  <!-- Boss -->
+  @if (boss()) {
+    <div class="boss-obstacle d-flex flex-column align-items-center"
+         [style.left.%]="boss()!.x"
+         [style.top.%]="boss()!.y">
+      <div class="boss-circle d-flex align-items-center justify-content-center rounded-circle">PROD</div>
+      <div class="boss-label">DEADLINE</div>
+    </div>
+  }
+
+  <!-- Fusée -->
+  <div class="rocket-wrap"
+       [style.left.%]="animState() !== 'none' ? 50 : rocketX()"
+       [style.top.%]="animState() !== 'none' ? 52 : rocketY()"
+       [ngClass]="{
+         floating:   gameState() === 'start' && animState() === 'none',
+         invincible: isInvincible(),
+         exploding:  gameState() === 'dead',
+         animating:  animState() !== 'none'
+       }">
+    <div class="rocket" [ngClass]="['damage-' + rocketDamage(), 'anim-' + animState()]">
+      <img class="rocket-img" src="images/spaceship-hugo.png" alt="Fusée" />
+
+      <div class="porthole top">
+        <img class="face normal" src="images/photo-hugo.png" alt="Hugo" />
+        <img class="face scared" src="images/photo-hugo-peur.png" alt="Hugo apeuré" />
+        <div class="blood"></div>
+      </div>
+
+      <div class="porthole mid">
+        <img class="face normal" src="images/photo-nicolas-hugo.png" alt="Nicolas" />
+        <img class="face scared" src="images/photo-nicolas-peur-hugo.png" alt="Nicolas apeuré" />
+        <div class="blood"></div>
+      </div>
+
+      <div class="porthole bot">
+        <img class="face" src="images/monstre-hugo.jpg" alt="Monstre" />
+        <div class="blood"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bouton animation flottant -->
+  <button class="btn-anim d-flex align-items-center justify-content-center rounded-circle"
+          title="Lancer l'animation"
+          (click)="launchAnimation()"
+          [disabled]="animState() !== 'none'">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="1" y="2.5" width="12" height="9" rx="1.5"/>
+      <line x1="1" y1="5" x2="13" y2="5"/>
+      <line x1="1" y1="9" x2="13" y2="9"/>
+      <line x1="3.5" y1="2.5" x2="3.5" y2="5"/>
+      <line x1="10.5" y1="2.5" x2="10.5" y2="5"/>
+      <line x1="3.5" y1="9" x2="3.5" y2="11.5"/>
+      <line x1="10.5" y1="9" x2="10.5" y2="11.5"/>
+      <polygon points="5.5,6.5 5.5,8.5 8.5,7.5" fill="currentColor" stroke="none"/>
+    </svg>
+  </button>
+
+  <!-- Écran de démarrage -->
+  @if (gameState() === 'start') {
+    <div class="overlay d-flex flex-column align-items-center justify-content-center gap-3">
+      <h2 class="overlay-title text-white fw-bold m-0 text-uppercase"><span class="prompt">&gt;</span> Esquive les bugs</h2>
+      <p class="overlay-desc text-center m-0">Pilote la fusée avec les flèches et évite les obstacles</p>
+      <div class="obs-preview d-flex justify-content-center gap-2">
+        <div class="obstacle danger-3" style="--obs-color:#CB3837;--obs-text:#fff"><div class="obs-circle d-flex align-items-center justify-content-center rounded-circle">NPM</div><div class="obs-label">ERR!</div></div>
+        <div class="obstacle danger-2" style="--obs-color:#F7DF1E;--obs-text:#222"><div class="obs-circle d-flex align-items-center justify-content-center rounded-circle">JS</div><div class="obs-label">TypeError</div></div>
+        <div class="obstacle danger-2" style="--obs-color:#1572B6;--obs-text:#fff"><div class="obs-circle d-flex align-items-center justify-content-center rounded-circle">CSS</div><div class="obs-label">!important</div></div>
+        <div class="obstacle danger-1" style="--obs-color:#E34F26;--obs-text:#fff"><div class="obs-circle d-flex align-items-center justify-content-center rounded-circle">HTML</div><div class="obs-label">&lt;div&gt;</div></div>
+      </div>
+      <button class="btn-game fw-bold text-uppercase" (click)="startGame()">Démarrer</button>
+    </div>
+  }
+
+  <!-- Game over -->
+  @if (gameState() === 'dead') {
+    <div class="overlay d-flex flex-column align-items-center justify-content-center gap-3">
+      <h2 class="overlay-title text-white fw-bold m-0 text-uppercase"><span class="prompt">//</span> KABOOM</h2>
+      <p class="overlay-desc text-center m-0">Les bugs ont eu raison de ta fusée...</p>
+      <p class="overlay-desc text-center m-0" style="opacity:.6">Score : {{ score() }} pts</p>
+      <button class="btn-game fw-bold text-uppercase" (click)="startGame()">Réessayer</button>
+    </div>
+  }
+
+  <!-- Victoire -->
+  @if (gameState() === 'win') {
+    <div class="overlay d-flex flex-column align-items-center justify-content-center gap-3">
+      <div class="win-scene">
+        <div class="win-planet"></div>
+        <div class="win-rocket">
+          <img src="images/spaceship-hugo.png" alt="Victoire" />
+        </div>
+      </div>
+      <h2 class="overlay-title text-white fw-bold m-0 text-uppercase"><span class="prompt">✓</span> Mission accomplie !</h2>
+      <p class="overlay-desc text-center m-0">Score final : {{ score() }} pts</p>
+      <button class="btn-game fw-bold text-uppercase" (click)="startGame()">Rejouer</button>
+    </div>
+  }
+</div>
