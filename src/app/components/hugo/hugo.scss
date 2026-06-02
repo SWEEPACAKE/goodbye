@@ -1,0 +1,629 @@
+@use 'sass:math';
+
+:host {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 340px;
+  overflow: hidden;
+}
+
+// ─── Star generation ────────────────────────────────────────────
+
+$star-count: 200;
+
+@function random-stars($n) {
+  $value: '#{math.random(2000)}px #{math.random(2000)}px #fff';
+  @for $i from 2 through $n {
+    $value: '#{$value}, #{math.random(2000)}px #{math.random(2000)}px #fff';
+  }
+  @return unquote($value);
+}
+
+$shadows-small:  random-stars(700);
+$shadows-medium: random-stars(200);
+$shadows-big:    random-stars(100);
+
+// ─── Background ─────────────────────────────────────────────────
+
+#background {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at bottom, #0d1b4b 0%, #000010 100%);
+  overflow: hidden;
+
+  .stars {
+    position: absolute; top: 0; left: 0;
+    width: 1px; height: 1px; border-radius: 50%;
+    box-shadow: $shadows-small;
+    animation: animStar 50s linear infinite;
+    &::after {
+      content: ''; position: absolute; top: -2000px; left: 0;
+      width: 1px; height: 1px; border-radius: 50%;
+      box-shadow: $shadows-small;
+    }
+  }
+
+  .stars2 {
+    position: absolute; top: 0; left: 0;
+    width: 2px; height: 2px; border-radius: 50%;
+    box-shadow: $shadows-medium;
+    animation: animStar 100s linear infinite;
+    &::after {
+      content: ''; position: absolute; top: -2000px; left: 0;
+      width: 2px; height: 2px; border-radius: 50%;
+      box-shadow: $shadows-medium;
+    }
+  }
+
+  .stars3 {
+    position: absolute; top: 0; left: 0;
+    width: 3px; height: 3px; border-radius: 50%;
+    box-shadow: $shadows-big;
+    animation: animStar 150s linear infinite;
+    &::after {
+      content: ''; position: absolute; top: -2000px; left: 0;
+      width: 3px; height: 3px; border-radius: 50%;
+      box-shadow: $shadows-big;
+    }
+  }
+
+  .shooting-star {
+    position: absolute;
+    top: 10%; left: -200px;
+    width: 180px; height: 2px;
+    background: linear-gradient(to right, rgba(255,255,255,0), #fff);
+    border-radius: 2px;
+    animation: shootingStar 6s ease-in-out infinite;
+    opacity: 0;
+    &::after {
+      content: ''; position: absolute; right: 0;
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #fff; box-shadow: 0 0 8px 4px rgba(255,255,255,0.6);
+      transform: translateY(-50%);
+    }
+    &.s2 { top: 30%; width: 120px; animation-delay: 3s; }
+  }
+}
+
+// ─── HUD Vies ───────────────────────────────────────────────────
+
+.hud-lives {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 20;
+  gap: 5px;
+}
+
+.life-icon {
+  width: 18px;
+  transition: opacity 0.4s, filter 0.4s;
+
+  img { display: block; width: 100%; height: auto; }
+
+  &.lost img { opacity: 0.2; filter: grayscale(1); }
+}
+
+// ─── Fusée ──────────────────────────────────────────────────────
+
+.rocket-wrap {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+
+  &.floating .rocket { animation: rocketFloat 4s ease-in-out infinite; }
+
+  &.invincible { animation: invincibleBlink 0.15s linear infinite; }
+
+  &.exploding {
+    pointer-events: none;
+    animation: rocketExplode 1s ease-out forwards;
+  }
+
+  // Transition douce vers la position/taille animation
+  &.animating {
+    transition: left 0.5s ease, top 0.5s ease;
+    animation: none !important;
+
+    .rocket {
+      width: 120px;
+      transition: width 0.3s ease;
+      animation: none !important;
+    }
+  }
+}
+
+.rocket {
+  position: relative;
+  width: 22px;
+  transition: width 0.3s ease;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  &::before {
+    mix-blend-mode: screen;
+    background:
+      // Crack principale diagonale — impact haut-droite
+      linear-gradient(128deg,
+        transparent 26%,
+        rgba(255,200,80,.14) 26.7%,
+        rgba(255,255,200,.92) 27.3%,
+        rgba(255,200,80,.14) 27.9%,
+        transparent 28.6%),
+      // Branche montante
+      linear-gradient(62deg,
+        transparent 53%,
+        rgba(255,180,60,.12) 53.6%,
+        rgba(255,240,160,.78) 54.2%,
+        rgba(255,180,60,.12) 54.8%,
+        transparent 55.4%),
+      // Micro-fissure verticale
+      linear-gradient(172deg,
+        transparent 38%,
+        rgba(255,160,50,.1) 38.6%,
+        rgba(255,220,140,.65) 39.1%,
+        rgba(255,160,50,.1) 39.6%,
+        transparent 40.2%);
+  }
+
+  &::after {
+    mix-blend-mode: screen;
+    background:
+      // Crack impact bas-gauche
+      linear-gradient(207deg,
+        transparent 40%,
+        rgba(255,120,20,.18) 40.6%,
+        rgba(255,230,160,.95) 41.2%,
+        rgba(255,120,20,.18) 41.8%,
+        transparent 42.4%),
+      // Branche de la crack bas-gauche
+      linear-gradient(152deg,
+        transparent 62%,
+        rgba(255,100,15,.12) 62.6%,
+        rgba(255,210,120,.8) 63.2%,
+        rgba(255,100,15,.12) 63.8%,
+        transparent 64.4%),
+      // Réseau araignée — micro-fissure A
+      linear-gradient(44deg,
+        transparent 18%,
+        rgba(255,90,10,.1) 18.6%,
+        rgba(255,190,80,.68) 19.1%,
+        rgba(255,90,10,.1) 19.6%,
+        transparent 20.2%),
+      // Réseau araignée — micro-fissure B
+      linear-gradient(110deg,
+        transparent 74%,
+        rgba(255,70,0,.1) 74.5%,
+        rgba(255,170,60,.62) 75%,
+        rgba(255,70,0,.1) 75.5%,
+        transparent 76.1%);
+  }
+
+  &.damage-0 { filter: none; }
+
+  &.damage-1 {
+    filter: drop-shadow(0 0 6px rgba(255,120,0,.8));
+    &::before { opacity: 1; }
+  }
+
+  &.damage-2 {
+    filter: drop-shadow(0 0 12px rgba(255,30,0,1)) sepia(.35);
+    animation: damagedShake .35s ease-in-out infinite;
+    &::before, &::after { opacity: 1; }
+    &::after { box-shadow: inset 0 0 18px rgba(255,40,0,.28); }
+  }
+}
+
+.rocket-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+}
+
+// ─── Hublots (pour l'animation coucou) ──────────────────────────
+
+.porthole {
+  position: absolute;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  overflow: hidden;
+
+  &.top { top: 11.9%; left: 41.7%; width: 17.6%; }
+  &.mid { top: 22.4%; left: 37.5%; width: 25.1%; }
+  &.bot { top: 36.1%; left: 21.9%; width: 55.8%; }
+}
+
+.blood {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 48% 42%, #6b0000 0%, #cc1111 22%, rgba(180,0,0,.65) 42%, transparent 62%),
+    radial-gradient(circle at 28% 72%, rgba(170,0,0,.88) 0%, transparent 24%),
+    radial-gradient(circle at 73% 66%, rgba(150,0,0,.78) 0%, transparent 20%),
+    radial-gradient(circle at 55% 16%, rgba(200,10,10,.6) 0%, transparent 18%),
+    radial-gradient(circle at 18% 38%, rgba(180,0,0,.52) 0%, transparent 16%),
+    radial-gradient(circle at 82% 32%, rgba(160,0,0,.5) 0%, transparent 17%),
+    radial-gradient(circle at 40% 85%, rgba(190,10,10,.6) 0%, transparent 15%);
+}
+
+.face {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  transform: translateY(115%);
+}
+
+// ─── États animation coucou / monster / splat ────────────────────
+
+.anim-coucou .porthole.top .face.normal {
+  animation: facePopUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+.anim-coucou .porthole.mid .face.normal {
+  animation: facePopUp 0.5s 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.anim-monster .porthole.top .face.normal  { animation: slideDown 0.3s ease-in forwards; }
+.anim-monster .porthole.mid .face.normal  { animation: slideDown 0.3s 0.05s ease-in forwards; }
+.anim-monster .porthole.top .face.scared  { animation: facePopUp 0.5s 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+.anim-monster .porthole.mid .face.scared  { animation: facePopUp 0.5s 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+.anim-monster .porthole.bot .face         { animation: facePopUp 0.6s 0.3s  cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
+.anim-splat .porthole.top .face.scared    { animation: slideDown 0.35s ease-in both; }
+.anim-splat .porthole.mid .face.scared    { animation: slideDown 0.35s 0.05s ease-in both; }
+.anim-splat .porthole.bot .face           { animation: slideUp 0.5s ease-in both; }
+.anim-splat .porthole.top .blood          { animation: bloodSplat 0.7s 0.3s  cubic-bezier(0.175, 0.885, 0.32, 1.275) both; }
+.anim-splat .porthole.mid .blood          { animation: bloodSplat 0.7s 0.4s  cubic-bezier(0.175, 0.885, 0.32, 1.275) both; }
+.anim-splat .porthole.bot .blood          { animation: bloodSplat 0.8s 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275) both; }
+
+.anim-none .porthole .face  { transition: transform 0.35s ease-in; }
+.anim-none .porthole .blood { transition: opacity 0.5s ease; }
+
+// ─── Obstacles tech-logo ─────────────────────────────────────────
+
+.obstacle {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  user-select: none;
+  pointer-events: none;
+  animation: obstacleAppear 0.35s ease-out both;
+
+  &.danger-1 { --obs-size: 28px; --obs-font: 8px;  --lbl-font: 6px; }
+  &.danger-2 { --obs-size: 36px; --obs-font: 11px; --lbl-font: 7px; }
+  &.danger-3 { --obs-size: 46px; --obs-font: 13px; --lbl-font: 8px; }
+}
+
+.obs-circle {
+  width:  var(--obs-size, 36px);
+  height: var(--obs-size, 36px);
+  background: var(--obs-color, #888);
+  color: var(--obs-text, #fff);
+  font-size:   var(--obs-font, 11px);
+  font-weight: 900;
+  font-family: 'Arial Black', Impact, sans-serif;
+  letter-spacing: -0.04em;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.15);
+}
+
+.obs-label {
+  font-family: 'Courier New', monospace;
+  font-size:   var(--lbl-font, 7px);
+  font-weight: 700;
+  color: rgba(255,255,255,0.9);
+  background: rgba(0,0,0,0.5);
+  padding: 1px 4px;
+  border-radius: 3px;
+  white-space: nowrap;
+  letter-spacing: 0.03em;
+}
+
+// ─── Bouton animation flottant ───────────────────────────────────
+
+.btn-anim {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  z-index: 25;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff;
+  width: 36px;
+  height: 36px;
+  font-size: 0;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  backdrop-filter: blur(4px);
+
+  svg { display: block; }
+
+  &:hover:not(:disabled) { background: rgba(255,255,255,.22); transform: scale(1.1); }
+  &:disabled { opacity: 0.3; cursor: default; }
+}
+
+// ─── Overlays (start / game over) ───────────────────────────────
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  background: rgba(0, 0, 20, 0.65);
+  backdrop-filter: blur(3px);
+}
+
+.overlay-title {
+  font-family: 'Courier New', monospace;
+  font-size: 21px;
+  letter-spacing: 0.1em;
+  text-shadow: 0 0 20px rgba(100, 150, 255, 0.9);
+
+  .prompt {
+    color: #4ac;
+    margin-right: 0.35em;
+    text-shadow: 0 0 10px rgba(70, 200, 220, 0.7);
+  }
+}
+
+.overlay-desc {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  max-width: 250px;
+  line-height: 1.4;
+}
+
+.obs-preview {
+  .obstacle {
+    position: static;
+    transform: none !important;
+    animation: none;
+  }
+}
+
+.btn-game {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.85);
+  padding: 8px 0;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: color 0.15s, letter-spacing 0.15s;
+
+  &::before { content: '[ '; color: #4ac; transition: color 0.15s; }
+  &::after  { content: ' ]'; color: #4ac; transition: color 0.15s; }
+
+  &:hover {
+    color: #fff;
+    letter-spacing: 0.14em;
+    &::before, &::after { color: #7df; }
+  }
+  &:active { opacity: 0.7; }
+}
+
+// ─── Boss obstacle ─────────────────────────────────────────────
+
+.boss-obstacle {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 15;
+  pointer-events: none;
+  user-select: none;
+  gap: 5px;
+  animation: bossPulse 0.7s ease-in-out infinite alternate;
+}
+
+.boss-circle {
+  width: 76px;
+  height: 76px;
+  background: radial-gradient(circle at 38% 32%, rgba(255,180,80,.8) 0%, #e63300 35%, #8a0000 75%, #400 100%);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 900;
+  font-family: 'Arial Black', Impact, sans-serif;
+  letter-spacing: -0.02em;
+  box-shadow:
+    0 0 25px rgba(255,60,0,.8),
+    0 0 55px rgba(255,0,0,.4),
+    inset 0 2px 0 rgba(255,200,100,.3);
+  border: 2px solid rgba(255,120,40,.5);
+}
+
+.boss-label {
+  font-family: 'Courier New', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  color: rgba(255,200,100,.95);
+  background: rgba(80,0,0,.85);
+  padding: 2px 6px;
+  border-radius: 3px;
+  white-space: nowrap;
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 8px rgba(255,100,0,.8);
+  box-shadow: 0 0 10px rgba(255,60,0,.4);
+}
+
+// ─── HUD Score & niveau ──────────────────────────────────────
+
+.hud-score {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 20;
+  color: rgba(255,255,255,.85);
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-shadow: 0 0 8px rgba(80,150,255,.6);
+
+  .hud-unit { color: rgba(255,255,255,.45); font-size: 9px; }
+}
+
+.hud-level {
+  position: absolute;
+  top: 26px;
+  right: 10px;
+  z-index: 20;
+  color: rgba(160,210,255,.6);
+  font-family: 'Courier New', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.hud-boss-passes {
+  position: absolute;
+  top: 26px;
+  right: 10px;
+  z-index: 20;
+  color: #ff6a00;
+  font-family: 'Courier New', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-shadow: 0 0 8px rgba(255,100,0,.8);
+  animation: bossPulse 0.5s ease-in-out infinite alternate;
+
+  .passes-count { color: #ffcc44; }
+}
+
+// ─── Victoire ────────────────────────────────────────────────
+
+.win-scene {
+  position: relative;
+  width: 70px;
+  height: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.win-planet {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 38% 32%, rgba(220,245,255,.75) 0%, transparent 30%),
+    radial-gradient(circle at 65% 63%, rgba(0,80,140,.55) 0%, transparent 35%),
+    radial-gradient(circle at 30% 62%, rgba(30,160,80,.45) 0%, transparent 28%),
+    radial-gradient(ellipse, #1a8fe8 0%, #0b4f9e 50%, #021a42 100%);
+  box-shadow:
+    0 0 20px rgba(80,180,255,.5),
+    0 0 50px rgba(40,120,255,.25),
+    inset -14px -14px 28px rgba(0,0,60,.65);
+  animation: planetGlow 2.5s ease-in-out infinite alternate;
+  flex-shrink: 0;
+}
+
+.win-rocket {
+  position: absolute;
+  bottom: 0;
+  width: 22px;
+  animation: winRocketFly 2.5s ease-in-out infinite;
+  img { display: block; width: 100%; }
+}
+
+// ─── Keyframes ──────────────────────────────────────────────────
+
+@keyframes animStar {
+  from { transform: translateY(0); }
+  to   { transform: translateY(2000px); }
+}
+
+@keyframes shootingStar {
+  0%   { transform: translateX(0) translateY(0) rotate(-20deg); opacity: 0; }
+  5%   { opacity: 1; }
+  30%  { transform: translateX(120vw) translateY(40vh) rotate(-20deg); opacity: 0; }
+  100% { transform: translateX(120vw) translateY(40vh) rotate(-20deg); opacity: 0; }
+}
+
+@keyframes rocketFloat {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-12px); }
+}
+
+@keyframes invincibleBlink {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.08; }
+}
+
+@keyframes damagedShake {
+  0%, 100% { transform: rotate(0deg) translateX(0); }
+  25%      { transform: rotate(-2.5deg) translateX(-2px); }
+  75%      { transform: rotate(2.5deg)  translateX(2px); }
+}
+
+@keyframes rocketExplode {
+  0%   { transform: translate(-50%, -50%) scale(1);   filter: none;                                         opacity: 1;   }
+  12%  { transform: translate(-50%, -50%) scale(1.5); filter: brightness(8) saturate(3);                   opacity: 1;   }
+  35%  { transform: translate(-50%, -50%) scale(3.5); filter: brightness(3) saturate(2) hue-rotate(20deg); opacity: 0.85;}
+  65%  { transform: translate(-50%, -50%) scale(2.5); opacity: 0.35; }
+  100% { transform: translate(-50%, -50%) scale(5);   opacity: 0; }
+}
+
+@keyframes obstacleAppear {
+  from { opacity: 0; scale: 0.3; }
+  to   { opacity: 1; scale: 1; }
+}
+
+@keyframes facePopUp {
+  from { transform: translateY(115%); }
+  to   { transform: translateY(0); }
+}
+
+@keyframes slideDown {
+  from { transform: translateY(0); }
+  to   { transform: translateY(115%); }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-115%); }
+}
+
+@keyframes bloodSplat {
+  0%   { opacity: 0; transform: scale(0.2); }
+  40%  { opacity: 1; transform: scale(1.15); }
+  65%  { transform: scale(0.93); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes bossPulse {
+  from { filter: brightness(1)    drop-shadow(0 0 8px  rgba(255,60,0,.6)); }
+  to   { filter: brightness(1.25) drop-shadow(0 0 22px rgba(255,100,0,.95)); }
+}
+
+@keyframes planetGlow {
+  from { box-shadow: 0 0 20px rgba(80,180,255,.5),  0 0 50px rgba(40,120,255,.25), inset -14px -14px 28px rgba(0,0,60,.65); }
+  to   { box-shadow: 0 0 35px rgba(80,200,255,.7),  0 0 70px rgba(60,140,255,.4),  inset -14px -14px 28px rgba(0,0,60,.65); }
+}
+
+@keyframes winRocketFly {
+  0%   { transform: translateY(0)     rotate(-5deg); opacity: 0; }
+  12%  { opacity: 1; }
+  78%  { transform: translateY(-90px) rotate(0deg); opacity: 1; }
+  92%  { transform: translateY(-98px) scale(0.55)  rotate(0deg); opacity: 0.4; }
+  100% { transform: translateY(-100px) scale(0.3)  rotate(0deg); opacity: 0; }
+}
+
+
