@@ -1,1 +1,20 @@
-<p>dylan works!</p>
+<div class="game-wrap">
+  <canvas #gameCanvas (click)="onCanvasClick()" (touchstart)="$event.preventDefault(); onCanvasClick()"></canvas>
+
+  @if (state === 'menu') {
+    <div class="overlay menu-screen">
+      <div class="menu-box">
+        <h2>Resous les bugs !</h2>
+        <p>Nicolas doit sauter par-dessus <strong>10 erreurs</strong> de code !</p>
+        <p class="hint">ESPACE ou CLIC pour sauter</p>
+        <button class="btn-action" (click)="startGame(); $event.stopPropagation()">▶ DÉMARRER</button>
+      </div>
+    </div>
+  }
+
+  @if (state === 'victory') {
+    <div class="victory-banner">Niveau terminé !</div>
+  }
+
+</div>
+
