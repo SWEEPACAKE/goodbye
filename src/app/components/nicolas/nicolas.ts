@@ -245,7 +245,7 @@ export class Nicolas implements AfterViewInit, OnDestroy {
     this.resizeCanvas();
     this.initFighters();
     this.hadokenImage = new Image();
-    this.hadokenImage.src = 'images/hadoken.gif';
+    this.hadokenImage.src = 'images/spritesheet.png';
     this.ngZone.runOutsideAngular(() => {
       const loop = () => {
         this.update();
@@ -338,17 +338,33 @@ export class Nicolas implements AfterViewInit, OnDestroy {
   private drawHadoken(p: Projectile) {
     if (!this.hadokenImage.complete) return; // image pas encore chargée
 
+    // Délimitation de la spritesheet
+    const totalFrames = 6; 
+    const frameWidth = 200; 
+    const frameHeight = 172; 
+
+    // Calcul de la frame à afficher de la spritesheet.
+    const animationSpeed = 4;
+    const currentFrame = Math.floor(p.life / animationSpeed) % totalFrames;
+
+    // Décalage dans la spritesheet en fonction de la frame à afficher
+    const sx = currentFrame * frameWidth;
+    const sy = 0;
+
     const size = this.HADOKEN_DISPLAY_SIZE + Math.sin(p.life * 0.4) * 4;
     
     this.ctx.save();
     
-    // Flip si la boule va vers la gauche
     if (p.velocityX < 0) {
       this.ctx.translate(p.x * 2, 0);
       this.ctx.scale(-1, 1);
     }
 
-    this.ctx.drawImage(this.hadokenImage, p.x - size / 2, p.y - size / 2, size, size);
+    this.ctx.drawImage(
+      this.hadokenImage,
+      sx, sy, frameWidth, frameHeight, // On découpe ce dont on a besoin dans la spritesheet en fonction de ce qui a été calculé
+      p.x - size / 2, p.y - size / 2, size, size // Et on le cale là où on en a besoin dans le canvas
+    );
 
     this.ctx.restore();
   }
