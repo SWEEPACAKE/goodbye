@@ -1,1 +1,44 @@
-<p>nicolas works!</p>
+<div class="row">
+    <div class="col-12 col-md-7 p-4">
+        <div class="book" id="myBook">
+        
+            <div class="page-left-container">
+                
+                <div class="page cover">
+                    <div class="cover-title">Mes très chers poulains...</div>
+                    <div class="click-hint">Cliquez pour ouvrir</div>
+                </div>
+
+                <div class="page page-one">
+                    <p>Cette année avec vous fut une expérience atypique pour moi.</p>
+                    <p>Elle fut riche en rebondissements, riche en partage, et riche d'enseignements.</p>
+                    <p>Autant pour vous que pour moi : J'ai moi-même appris beaucoup à vos côtés et je ne suis pas près de l'oublier.</p>
+                    <p>Alors je voudrais vous laisser ici ces quelques mots :</p>
+                </div>
+
+            </div>
+
+            <div class="page page-right">
+                <p><strong>Croyez en vous</strong>, ne vous laissez pas poser des limites qui ne sont pas les vôtres, vous avez déjà accompli tellement de choses en une seule année.</p>
+                <p>Aux plus téméraires d'entre vous, j'offre ce dernier challenge : À vous de conquérir votre avenir en mettant une branlée aux futurs obstacles qui se dresseront sur votre route !</p>
+                <p>Amicalement, </p>
+                <p>Votre prof ❤️</p>
+            </div>
+
+        </div>
+    </div>
+    <div class="col-12 col-md-5">
+        <canvas #gameCanvas
+            tabindex="0"
+            (click)="gameCanvas.focus()"
+            (keydown)="onKeyDown($event)"
+            (keyup)="onKeyUp($event)">
+        </canvas>
+        
+        @if (gameOver) {
+            <button class="restart-btn" (click)="restart()">
+                {{ victory ? 'Rejouer ?' : 'Réessayer' }}
+            </button>
+        }
+    </div>
+</div>
