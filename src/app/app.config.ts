@@ -4,7 +4,6 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { SlotRegistryService } from './services/slot-registry';
 
-import { Nicolas } from './components/nicolas/nicolas';
 import { Dylan } from './components/dylan/dylan';
 import { Hugo } from './components/hugo/hugo';
 import { Abdelazize } from './components/abdelazize/abdelazize';
@@ -14,7 +13,6 @@ import { Nadege } from './components/nadege/nadege';
 import { Emmanuel } from './components/emmanuel/emmanuel';
 
 const STUDENT_COMPONENTS = [
-  Nicolas,
   Dylan,
   Hugo,
   Abdelazize,
