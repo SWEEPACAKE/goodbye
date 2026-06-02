@@ -1,8 +1,9 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, HostListener } from '@angular/core';
 import { Banner } from "./components/banner/banner";
 import { SlotRegistryService } from './services/slot-registry';
 import { NgComponentOutlet } from '@angular/common';
 import { Slot } from './models/slot';
+import { Nicolas } from './components/nicolas/nicolas';
 @Component({
   selector: 'app-root',
   imports: [Banner, NgComponentOutlet],
@@ -10,8 +11,19 @@ import { Slot } from './models/slot';
   styleUrl: './app.scss'
 })
 export class App implements OnInit {
-  protected readonly title = signal('goodbye');
+  
+  // Empêcher le scroll si on appuie sur espace
+  @HostListener('window:keydown', ['$event'])
 
+  onKeyDown(e: KeyboardEvent) {
+    const blockedKeys = ['Space', 'ArrowUp', 'ArrowDown'];
+    if (blockedKeys.includes(e.code)) {
+      e.preventDefault();
+    }
+  }
+  
+  protected readonly title = signal('goodbye');
+  nicolas = Nicolas;
   registry = inject(SlotRegistryService);
 
     slots: Slot[] = [
@@ -22,7 +34,6 @@ export class App implements OnInit {
     { size: 'small',  component: null },
     { size: 'large',  component: null },
     { size: 'small',  component: null },
-    { size: 'large',  component: null },
   ];
 
   ngOnInit() {
