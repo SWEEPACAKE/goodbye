@@ -1,4 +1,5 @@
 @use 'sass:math';
+@use "sass:string";
 
 :host {
   display: block;
@@ -18,7 +19,7 @@ $star-count: 200;
   @for $i from 2 through $n {
     $value: '#{$value}, #{math.random(2000)}px #{math.random(2000)}px #fff';
   }
-  @return unquote($value);
+  @return string.unquote($value);
 }
 
 $shadows-small:  random-stars(700);
